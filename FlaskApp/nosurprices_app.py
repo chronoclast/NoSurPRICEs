@@ -19,6 +19,10 @@ import cv2
 # other modules
 import requests
 import json
+# cloudant modules
+from cloudant.client import Cloudant
+from cloudant.error import CloudantException
+from cloudant.result import Result, ResultByKey
 
 UPLOAD_FOLDER = '/media/sf_D_DRIVE/emeli/Documents/ShapeRPic/Hackathon ReCoding Aviation/NoSurPRICEsflaskApp'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -27,6 +31,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "super secret string"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config["CACHE_TYPE"] = "null"
+
+serviceUsername = "<YOUR_USER_NAME>-bluemix"
+servicePassword = "<YOUR_PASSWORD>"
+serviceURL = "https://<YOUR_USER_NAME>-bluemix.cloudant.com"
 
 bootstrap = Bootstrap(app)
 moment = Moment(app)
@@ -40,7 +48,7 @@ class NameForm(Form):
 	sumbit = SubmitField("Submit")
 
 class SelectAirline(Form):
-	name = SelectField(u'Please select your airline', choices=[('Ryanair','Ryanair'),('EasyJet','EasyJet'), ('AirBerlin','AirBerlin'), ('Transavia','Transavia')])	
+	name = SelectField(u'Please select your airline', choices=[('Ryanair','Ryanair'),('easyJet','easyJet'), ('AerLingus','AerLingus'), ('AirFrance','AirFrance'), ('Delta','Delta'), ('KLM','KLM'), ('Lufthansa','Lufthansa'), ('Vueling','Vueling'), ('Flybe','Flybe'), ('Norwegian','Norwegian'), ('Qatar','Qatar')])	
 	sumbit = SubmitField("Submit")
 	
 class ConfirmButton(Form):
@@ -135,7 +143,7 @@ def measure_luggage(angle):
 	for cnt in contours:
 		count = count+1
 		area = cv2.contourArea(cnt)
-		cntlimit = 30000
+		cntlimit = 10000
 		if area < cntlimit:
 			continue
 		orig = image.copy()	
@@ -293,22 +301,64 @@ def calculation(angle):
 		your_measurements = str(round(h,2))+" x "+str(round(w,2))+" x "+str(round(d,2))
 		airline_measurements = str(allowed_h)+" x "+str(allowed_w)+" x "+str(allowed_d)
 		if h > allowed_h:
+			approved = False
+			send_data(approved, h, w, d)
 			return render_template('pity.html', your_measurements=your_measurements,airline_measurements=airline_measurements,airline=airline[0])
 		if w > allowed_w:
+			approved = False
+			send_data(approved, h, w, d)
 			return render_template('pity.html', your_measurements=your_measurements,airline_measurements=airline_measurements,airline=airline[0])
 		if d > allowed_d:
+			approved = False
+			send_data(approved, h, w, d)
 			return render_template('pity.html', your_measurements=your_measurements,airline_measurements=airline_measurements,airline=airline[0])
-		return render_template('pity.html', your_measurements=your_measurements,airline_measurements=airline_measurements,airline=airline)
-		
+		approved = True
+		send_data(approved, h, w, d)
+		return render_template('succes.html', your_measurements=your_measurements,airline_measurements=airline_measurements,airline=airline[0])
+	
+def send_data(approved, h, w, d):
+	# Use the Cloudant library to create a Cloudant client.
+	client = Cloudant(serviceUsername, servicePassword, url=serviceURL)
 
-@app.route("/user/<name>")
-def user(name):
-	return render_template('user.html', name=name)
+	# Connect to the server.
+	client.connect()
+
+	# This is the name of the database we are working with.
+	databaseName = "baggage"
+
+	# Connect to the database.
+	myDatabaseDemo = client[databaseName]
+	
+	baggage_id_txt = open('static/baggage_id.txt', 'r').readlines()
+	baggage_id = baggage_id_txt[0]
+	
+	# Create a JSON document that stores all the data
+	jsonDocument = {
+		'_id': str(baggage_id),
+		'height': h,
+		'width': w,
+		'depth': d,
+		'approved': approved
+		}
+
+	# Create a new entry on the database using the API.
+	newDocument = myDatabaseDemo.create_document(jsonDocument)
+
+	# Space out the results.
+	print "Success!"
+
+	# Disconnect from the server
+	client.disconnect()	
+	
+	baggage_id = int(baggage_id)+1
+	baggage_id_text = open('static/baggage_id.txt', 'w')
+	baggage_id_text.write(str(baggage_id))
+	baggage_id_text.close()
+
 	
 @app.errorhandler(404)
 def page_not_found(e):
-	return render_template("404.html"), 404
+	return render_template("404.html"), 404	
 	
-
 if __name__ == "__main__":
 	app.run(debug=True)	

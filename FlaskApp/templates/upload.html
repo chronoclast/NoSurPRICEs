@@ -4,9 +4,9 @@
 {% block title %} NoSurPRICEs{% endblock %}
 	
 {% block content %}
-<div class="container">
-	<div class="page-header">
-		<div>
+<div class="container" style="margin-left:50px">
+	<div class="page-header" style="margin-left:50px">
+		<div style="margin-left:50px">
 			<h1>Please upload a picture of the <strong>{{angle}}</strong> of your luggage: </h1>
 			<form method=post enctype=multipart/form-data>
 			<p><input type=file name=file>
@@ -14,7 +14,7 @@
 				</form>
 			</div>	
 				
-			<div>
+			<div style="margin-left:50px">
 				{% if saved %}
 					<img src="{{path}}" width="150" height="auto">
 					<form action="{{url}}">
