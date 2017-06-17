@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %} NoSurPRICEs{% endblock %}
+	
+{% block content %}
+<div class="page_header">
+	<h3 style="color:red; font-size:80px;text-align:center"> Oh no - your luggage is too big...</h3>
+	<img src="https://media2.giphy.com/media/CM1rHbKDMH2BW/giphy.gif">
+	<p> The allowed sizes for {{airline}} are {{airline_measurements}}. </p>
+	<p> Your luggage is {{your_measurements}} </p>
+</div>
+{% endblock %}	

@@ -9,17 +9,16 @@ from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
 from flask import send_from_directory
-from nocache import nocache
 # opencv related modules
 from scipy.spatial import distance as dist
 from imutils import perspective
 from imutils import contours
 import numpy as np
-import argparse
 import imutils
 import cv2
-from matplotlib import pyplot as plt
-import time
+# other modules
+import requests
+import json
 
 UPLOAD_FOLDER = '/media/sf_D_DRIVE/emeli/Documents/ShapeRPic/Hackathon ReCoding Aviation/NoSurPRICEsflaskApp'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -53,14 +52,14 @@ def index():
 	measurements = None
 	if form.validate_on_submit():
 			session['name'] = form.name.data
-			if session['name'] == "Ryanair":
-				session['measurements'] = "55 cm x 40 cm x 20 cm"
+			f = open('static/airline.txt', 'w')
+			f.write(session['name'])
+			f.close()
 			return redirect(url_for('upload_front'))
 	return render_template('index.html', current_time = datetime.utcnow(), form=form, name=session.get('name'), measurements = session.get('measurements'))
 
 
 @app.route("/upload_front", methods=["GET","POST"])
-@nocache
 def upload_front():
 	saved = None
 	path = None
@@ -84,7 +83,6 @@ def upload_front():
 	return render_template('upload.html', angle="front", path=path, saved=saved, url=url)	
 
 @app.route("/upload_side", methods=["GET","POST"])
-@nocache
 def upload_side():
 	saved = None
 	path = None
@@ -111,7 +109,6 @@ def midpoint(ptA, ptB):
 	return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)	
 
 @app.route("/measure_luggage/<angle>")
-@nocache	
 def measure_luggage(angle):
 	name = None
 	saved = None
@@ -138,7 +135,7 @@ def measure_luggage(angle):
 	for cnt in contours:
 		count = count+1
 		area = cv2.contourArea(cnt)
-		cntlimit = 10000
+		cntlimit = 30000
 		if area < cntlimit:
 			continue
 		orig = image.copy()	
@@ -188,10 +185,13 @@ def measure_luggage(angle):
 		cv2.putText(orig, "{:.1f}cm".format(dimB),
 			(int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
 			2, (255, 255, 255), 3)
+		break
 
 	(_, cnts, _) = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)	 
 
 	# finding the trolley
+	if pixelsPerMetric is None:
+		return "<h1> We did not spot your coaster </h1>"
 	count = 0
 	savecount = 0
 	for c in cnts:
@@ -200,7 +200,7 @@ def measure_luggage(angle):
 		print cv2.contourArea(c)
 		# if the contour is not sufficiently large, ignore it
 		area = cv2.contourArea(c)
-		cntlimit = 120000
+		cntlimit = 170000
 		if area < cntlimit:
 			continue
 		# compute the rotated bounding box of the contour
@@ -238,9 +238,6 @@ def measure_luggage(angle):
 		# compute the Euclidean distance between the midpoints
 		dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
 		dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
-		
-		if pixelsPerMetric is None:
-			pixelsPerMetric = dB / 2
 
 		# compute the size of the object
 		dimA = dA / pixelsPerMetric
@@ -253,14 +250,57 @@ def measure_luggage(angle):
 		cv2.putText(orig, "{:.1f}cm".format(dimB),
 			(int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
 			2, (255, 255, 255), 3)
-		
+			
 		# show the output orig
 		name = "static/measured_"+angle+".jpg"
 		cv2.imwrite(name, orig)
 		name = "http://localhost:5000/static/measured_"+angle+".jpg"
 		saved = True
-		return render_template("measure_luggage.html", angle=angle, saved=saved, name=name)		
-	
+		url_good = "http://localhost:5000/calculation/"+angle
+		url_bad = "http://localhost:5000/measure_luggage/"+angle
+		textfile = "static/"+angle+"_measurements.txt"
+		f = open(textfile, 'w')
+		f.write(str(dimA)+";")
+		f.write(str(dimB))
+		f.close()
+		return render_template("measure_luggage.html", angle=angle, saved=saved, name=name, url_good=url_good, url_bad=url_bad)		
+
+@app.route("/calculation/<angle>")
+def calculation(angle):
+	if angle == "front":
+		return redirect("measure_luggage/side")
+	if angle == "side":
+		h_and_w = open('static/front_measurements.txt', 'r').readlines()
+		h_and_w = h_and_w[0].split(";")
+		if float(h_and_w[0]) > float(h_and_w[1]):
+			h = float(h_and_w[0])
+			w = float(h_and_w[1])
+		else:
+			w = float(h_and_w[0])
+			h = float(h_and_w[1])
+		h_and_d = open('static/side_measurements.txt', 'r').readlines()
+		h_and_d = h_and_d[0].split(";")
+		if float(h_and_d[0]) > float(h_and_d[1]):
+			d = float(h_and_d[1])	
+		else:
+			d = float(h_and_d[0])
+		airline = open('static/airline.txt', 'r').readlines()
+		r = requests.get('https://389c0932-8ba8-406b-8730-ff8b76623111-bluemix.cloudant.com/maxsize/'+airline[0])
+		response = json.loads(r.text)
+		allowed_h = response['baggageHeight']
+		allowed_w = response['baggageWidth']
+		allowed_d = response['baggageDepth']
+		your_measurements = str(round(h,2))+" x "+str(round(w,2))+" x "+str(round(d,2))
+		airline_measurements = str(allowed_h)+" x "+str(allowed_w)+" x "+str(allowed_d)
+		if h > allowed_h:
+			return render_template('pity.html', your_measurements=your_measurements,airline_measurements=airline_measurements,airline=airline[0])
+		if w > allowed_w:
+			return render_template('pity.html', your_measurements=your_measurements,airline_measurements=airline_measurements,airline=airline[0])
+		if d > allowed_d:
+			return render_template('pity.html', your_measurements=your_measurements,airline_measurements=airline_measurements,airline=airline[0])
+		return render_template('pity.html', your_measurements=your_measurements,airline_measurements=airline_measurements,airline=airline)
+		
+
 @app.route("/user/<name>")
 def user(name):
 	return render_template('user.html', name=name)

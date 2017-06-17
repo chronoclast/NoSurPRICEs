@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %} NoSurPRICEs{% endblock %}
+	
+{% block content %}
+<div class="container">
+	<div class="page-header">
+	<h1>
+{% if name %}
+	Hello, {{name|capitalize}}! 
+{% else %}
+	Hello, weirdo!
+{% endif %}	
+		</h1>
+	</div>
+</div>
+{% endblock %}	
