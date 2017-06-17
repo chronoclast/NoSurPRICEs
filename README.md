@@ -16,6 +16,10 @@ Click on the picture below to **visit the project page**:
 
 Our solution consists on an app that, after submitting a picture of your luggage, will check "automagically" if it's approved for the cabin. It will check the size, and if it fits for an specific airline. Besides, it may also calculate the estimated room available in the plane! The airport authorities can know the approximate average size of hand luggages for further analytics, with realtime data.
 
+## Live Dashboard
+
+A **live dashboard displaying real-time values** has been deployed as a Cloud Foundry app, and it's [available in IBM Bluemix](https://no-surprices.eu-gb.mybluemix.net/ui/).
+
 ## Solution Architecture
 
 --- WORK IN PROGRESS ---
