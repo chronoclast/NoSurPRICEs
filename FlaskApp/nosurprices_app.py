@@ -35,7 +35,6 @@ app.config["CACHE_TYPE"] = "null"
 serviceUsername = "<YOUR_USER_NAME>-bluemix"
 servicePassword = "<YOUR_PASSWORD>"
 serviceURL = "https://<YOUR_USER_NAME>-bluemix.cloudant.com"
-
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 
@@ -343,9 +342,11 @@ def send_data(approved, h, w, d):
 
 	# Create a new entry on the database using the API.
 	newDocument = myDatabaseDemo.create_document(jsonDocument)
-
-	# Space out the results.
-	print "Success!"
+	
+	# replace the zero index with the latest input
+	zero = myDatabaseDemo['0']
+	zero['count'] = baggage_id
+	zero.save()
 
 	# Disconnect from the server
 	client.disconnect()	
