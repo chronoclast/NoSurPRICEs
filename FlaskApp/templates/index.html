@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<img src="https://res.cloudinary.com/ideation/image/upload/w_128,h_128/sdhvony7lmcwldl4b1zo.png" alt="Smiley face">
+
+<div style="margin-left:30px;width:200px" >
+{{ wtf.quick_form(form) }}
+</div>
+<div style="margin-left:30px">	
+<h2>
+{% if name %}
+	Selected airline: {{name|capitalize}}
+{% endif %}	
+		</h2>
+</div>
+{% endblock %}
