@@ -1,8 +1,30 @@
 --- WORK IN PROGRESS ---
 
-# Cloudant NoSQL Database
+# Cloudant NoSQL Databases
 
 ## Deployment In Bluemix
+
+### Adding the Service
+
+Once logged into the Bluemix platform, head to [**"Data & Analytics"**](https://console.bluemix.net/dashboard/data). You will be redirected to the specific domain of your region, but that is irrelevant for the following steps.
+
+Click on the **blue button "Create Data & Analytics service"**, and select **"Clodant NoSQL DB"**, as shown below.
+
+![](./assets/select-service.png)
+
+On the next menu, **introduce a "Service name" and a "Credentials name"**.
+
+On **"Connect to"**, select the application that you'd like to link to. This means that **your database will be accessible from another services**. In this project it was linked to the application _"No SurPRICEs"_, as depicted here:
+
+![](./assets/name-and-connect-service.png)
+
+This will make possible to select the Cloudant database later, from the nodes in the _"No SurPRICEs"_ Node-RED instance.
+
+Before clicking on "Create" (at the bottom of the page), make sure that you select **"Lite" as the pricing plan**. This plan provides 1 GB of data storage, but it's free. Besides, that is much more than what's needed for this project.
+
+Your service will now be available at the "Data & Analytics" page of your Bluemix account. To open it, select the service, and click on "Launch" on the next menu.
+
+### Creating Databases Manually from the User Interface
 
 --- WORK IN PROGRESS ---
 
@@ -13,7 +35,7 @@ Currently there are two databases that reside in the Cloudant service:
 * **Baggage:** It stores the size of the baggages, and if they're cabin-approved or not.
 * **Maximum baggage size per airline:** It contains the sizes of the cabin-approved (i.e. hand luggage) per airline.
 
-### Authentication / Permission
+### Reader Permissions
 
 Reader permissions have been granted to unauthenticated connections, meaning that these databases can also be used for external projects, without a login.
 
@@ -45,3 +67,9 @@ The response from the Cloudant instance should look like:
 	"baggageHeight":55
 }
 ```
+
+## Resources
+
+* [Cloudant API reference (Bluemix documentation)](https://console.bluemix.net/docs/services/Cloudant/api/index.html#api-reference-overview)
+* [Creating and populating a Cloudant database (Bluemix documentation)](https://console.bluemix.net/docs/services/Cloudant/tutorials/create_database.html#creating-and-populating-a-simple-cloudant-database-on-bluemix)
+* [Cloudant Python library documentation](http://python-cloudant.readthedocs.io/en/latest/getting_started.html#opening-a-database)
