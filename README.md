@@ -22,11 +22,9 @@ A **live dashboard displaying real-time values** has been deployed as a Cloud Fo
 
 ## Solution Architecture
 
---- WORK IN PROGRESS ---
+![Solution Architecture](./assets/solution_architecture.jpg)
 
 ## Business Presentation
-
---- WORK IN PROGRESS ---
 
 The **presentation** is available in [Google Slides](https://docs.google.com/presentation/d/1UIGyUU7l4xgKFQoWxhjXeaxU79P2UAArl4ggs6sJ058/edit?usp=sharing) (**Chrome is recommended**; other browsers such as Safari may show format issues).
 
@@ -46,7 +44,8 @@ A step-by-step of the Node-RED setup in Bluemix is available [here](./node-red-s
 
 ## To-Do
 
-* Deploy functional NoSQL in Bluemix.
+### Post-Hackathon:
+* Clean docs when time and mood allows!
 
 ## License
 
