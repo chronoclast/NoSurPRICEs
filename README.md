@@ -16,10 +16,6 @@ Click on the picture below to **visit the project page**:
 
 Our solution consists on an app that, after submitting a picture of your luggage, will check "automagically" if it's approved for the cabin. It will check the size, and if it fits for an specific airline. Besides, it may also calculate the estimated room available in the plane! The airport authorities can know the approximate average size of hand luggages for further analytics, with realtime data.
 
-## Live Dashboard
-
-A **live dashboard displaying real-time values** has been deployed as a Cloud Foundry app, and it's [available in IBM Bluemix](https://no-surprices.eu-gb.mybluemix.net/ui/).
-
 ## Solution Architecture
 
 ![Solution Architecture](./assets/solution_architecture.jpg)
@@ -28,13 +24,15 @@ A **live dashboard displaying real-time values** has been deployed as a Cloud Fo
 
 The **presentation** is available in [Google Slides](https://docs.google.com/presentation/d/1UIGyUU7l4xgKFQoWxhjXeaxU79P2UAArl4ggs6sJ058/edit?usp=sharing) (**Chrome is recommended**; other browsers such as Safari may show format issues).
 
-<!--
+## Live Dashboard
 
-A static **PDF version** can be downloaded [here](./assets/railax-biz-slides.pdf).
+**NOTE:** Unfortunately, as of July 2017, the **live dashboard displaying real-time values** deployed as a Cloud Foundry app in IBM Bluemix is no longer operative, since the associated account has expired.
 
-The additional pictures used in this presentation are available on [this Google Drive folder](https://drive.google.com/open?id=0B8B9qWtOwkjAS01FYlZyU1liUzg), in the `pics` directory.
+Below is a screenshot of the dashboard presented during the hackathon.
 
--->
+![](./assets/bi-dashboard.png)
+
+The next section documents how to replicate the dashboard locally, or online.
 
 ## Node-RED Setup
 
