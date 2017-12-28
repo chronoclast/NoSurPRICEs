@@ -39,7 +39,7 @@ Thumbs.db
 
 # Specific files and folders from this project #
 ################################################
-temp/*
+# temp/*
 # temp*
 assets/clean_images/
 assets/raw_images/

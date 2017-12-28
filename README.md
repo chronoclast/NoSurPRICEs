@@ -43,7 +43,10 @@ A step-by-step of the Node-RED setup in Bluemix is available [here](./node-red-s
 ## To-Do
 
 ### Post-Hackathon:
+
 * Clean docs when time and mood allows!
+* Add section and brief description of the Flask app.
+* Add brief description of the solution architecture.
 
 ## License
 

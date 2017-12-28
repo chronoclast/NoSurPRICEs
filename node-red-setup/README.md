@@ -2,7 +2,7 @@
 
 ## Deployment In Bluemix
 
---- WORK IN PROGRESS ---
+[official Node-RED documentation](https://nodered.org/docs/platforms/bluemix).
 
 ## Installing Additional Nodes
 
